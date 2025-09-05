@@ -66,11 +66,11 @@ const CompleteProfile = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-travel-brown-50 to-travel-brown-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="text-center mb-6">
-            <div className="w-20 h-20 mx-auto mb-4 bg-indigo-100 rounded-full flex items-center justify-center">
+            <div className="w-20 h-20 mx-auto mb-4 bg-travel-brown-100 rounded-full flex items-center justify-center">
               {user.profile_pic_url ? (
                 <img 
                   src={user.profile_pic_url} 
@@ -78,7 +78,7 @@ const CompleteProfile = () => {
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (
-                <svg className="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 text-travel-brown-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               )}
@@ -119,7 +119,7 @@ const CompleteProfile = () => {
                   setError('');
                 }}
                 placeholder="Enter your phone number"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-travel-brown-500 focus:border-travel-brown-500"
                 disabled={loading}
               />
               <p className="mt-1 text-xs text-gray-500">
@@ -131,7 +131,7 @@ const CompleteProfile = () => {
               <button
                 type="submit"
                 disabled={loading || !phoneNumber.trim()}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-travel-brown-600 hover:bg-travel-brown-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-travel-brown-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {loading ? (
                   <>
@@ -148,7 +148,7 @@ const CompleteProfile = () => {
               <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
-                className="text-sm text-indigo-600 hover:text-indigo-500"
+                className="text-sm text-travel-brown-600 hover:text-travel-brown-500"
                 disabled={loading}
               >
                 Skip for now (you can add this later)
