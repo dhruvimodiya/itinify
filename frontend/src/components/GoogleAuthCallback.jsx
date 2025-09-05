@@ -86,7 +86,7 @@ const GoogleAuthCallback = () => {
         {status === 'success' && (
           <>
             <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-travel-brown-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -106,7 +106,7 @@ const GoogleAuthCallback = () => {
             <p className="text-gray-600 mb-4">{message}</p>
             <button
               onClick={() => navigate('/login')}
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+              className="w-full bg-travel-brown-600 text-white py-2 px-4 rounded-md hover:bg-travel-brown-700 transition-colors"
             >
               Return to Login
             </button>

@@ -53,7 +53,7 @@ const ResendVerification = () => {
         <div className="max-w-md w-full space-y-8">
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-              <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6 text-travel-brown-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -77,13 +77,13 @@ const ResendVerification = () => {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/login')}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-travel-brown-600 hover:bg-travel-brown-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-travel-brown-500"
               >
                 Go to Login
               </button>
               <button
                 onClick={() => setSuccess(false)}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-travel-brown-500"
               >
                 Send to Different Email
               </button>
@@ -154,7 +154,7 @@ const ResendVerification = () => {
                   required
                   value={email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-travel-brown-500 focus:border-travel-brown-500 sm:text-sm"
                   placeholder="Enter your email address"
                 />
               </div>
@@ -167,7 +167,7 @@ const ResendVerification = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-travel-brown-600 hover:bg-travel-brown-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-travel-brown-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex items-center">
@@ -183,13 +183,13 @@ const ResendVerification = () => {
             <div className="text-center space-y-2">
               <Link
                 to="/login"
-                className="text-sm text-indigo-600 hover:text-indigo-500 block"
+                className="text-sm text-travel-brown-600 hover:text-travel-brown-500 block"
               >
                 Back to Login
               </Link>
               <Link
                 to="/register"
-                className="text-sm text-indigo-600 hover:text-indigo-500 block"
+                className="text-sm text-travel-brown-600 hover:text-travel-brown-500 block"
               >
                 Create New Account
               </Link>

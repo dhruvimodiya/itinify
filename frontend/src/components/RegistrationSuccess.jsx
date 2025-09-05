@@ -32,12 +32,12 @@ const RegistrationSuccess = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-travel-brown-600 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <div className="mb-6">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-travel-brown-100">
+              <svg className="h-8 w-8 text-travel-brown-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
@@ -51,9 +51,9 @@ const RegistrationSuccess = () => {
             Click the link in the email to verify your account and complete registration.
           </p>
           
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">What's Next?</h4>
-            <ol className="text-sm text-blue-700 text-left space-y-1">
+          <div className="bg-travel-brown-50 border border-travel-brown-600 rounded-md p-4 mb-6">
+            <h4 className="text-sm font-medium text-travel-brown-600 mb-2">What's Next?</h4>
+            <ol className="text-sm text-travel-brown-600 text-left space-y-1">
               <li>1. Check your email inbox (and spam folder)</li>
               <li>2. Click the verification link</li>
               <li>3. You'll be redirected to a success page</li>
@@ -63,17 +63,17 @@ const RegistrationSuccess = () => {
 
           {resent && (
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-sm text-green-600">
+              <p className="text-sm text-travel-brown-600">
                 ✅ Verification email resent successfully!
               </p>
             </div>
           )}
 
           <div className="space-y-3">
-            <button
+            {/* <button
               onClick={handleResendVerification}
               disabled={resending}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-travel-brown-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               {resending ? (
                 <div className="flex items-center">
@@ -83,11 +83,11 @@ const RegistrationSuccess = () => {
               ) : (
                 'Resend Verification Email'
               )}
-            </button>
+            </button> */}
             
             <button
               onClick={() => navigate('/login')}
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-white bg-travel-brown-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Go to Login
             </button>
