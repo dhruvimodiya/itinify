@@ -22,6 +22,7 @@ export default {
           800: '#723f06',
           900: '#5a2c02',
           950: '#2e1a01',
+          1000:'#6E260E'
         },
         'travel-accent': {
           50: '#f0f9ff',
