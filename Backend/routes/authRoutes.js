@@ -33,10 +33,10 @@ router.get('/google/callback',
             // Check if user needs to complete profile (e.g., phone number)
             const needsPhoneNumber = !req.user.number || req.user.number === '';
 
-            // Redirect to frontend with token and user info
+            // Redirect to frontend callback route with token and user info
             const redirectUrl = needsPhoneNumber 
-                ? `${process.env.CLIENT_URL}/complete-profile?token=${token}&needs_phone=true`
-                : `${process.env.CLIENT_URL}/dashboard?token=${token}`;
+                ? `${process.env.CLIENT_URL}/auth/google/callback?token=${token}&needs_phone=true`
+                : `${process.env.CLIENT_URL}/auth/google/callback?token=${token}`;
 
             res.redirect(redirectUrl);
 
