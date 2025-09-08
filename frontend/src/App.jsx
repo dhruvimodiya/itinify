@@ -33,7 +33,16 @@ function App() {
             <Route path="/verify-email" element={<VerificationHandler />} />
             <Route path="/resend-verification" element={<ResendVerification />} />
             <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
-            <Route path="/complete-profile" element={<CompleteProfile />} />
+            
+            {/* Semi-Protected Route - Complete Profile */}
+            <Route 
+              path="/complete-profile" 
+              element={
+                <ProtectedRoute>
+                  <CompleteProfile />
+                </ProtectedRoute>
+              } 
+            />
             
             {/* Protected Routes with Layout */}
             <Route 

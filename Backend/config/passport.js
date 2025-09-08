@@ -1,11 +1,12 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const crypto = require('crypto');
 const User = require('../models/User');
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `http://localhost:${process.env.PORT || 5000}/api/auth/google/callback`
+    callbackURL: `http://localhost:5000/api/auth/google/callback`
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         console.log('Google OAuth Profile:', {
@@ -32,12 +33,22 @@ passport.use(new GoogleStrategy({
             existingUser.google_id = profile.id;
             existingUser.profile_pic_url = profile.photos[0].value;
             existingUser.is_verified = true; // Google accounts are automatically verified
+            
+            // Generate verification token if not already present
+            if (!existingUser.verification_token) {
+                existingUser.verification_token = crypto.randomBytes(32).toString('hex');
+                existingUser.verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+            }
+            
             await existingUser.save();
             return done(null, existingUser);
         }
 
         // Create new user with Google data
         console.log('Creating new Google user:', profile.emails[0].value);
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+        
         const newUser = new User({
             name: profile.displayName,
             email: profile.emails[0].value,
@@ -45,8 +56,8 @@ passport.use(new GoogleStrategy({
             profile_pic_url: profile.photos[0].value,
             number: '', // Will need to be filled later by user if required
             is_verified: true, // Google accounts are automatically verified
-            verification_token: null,
-            verification_token_expires: null
+            verification_token: verificationToken,
+            verification_token_expires: tokenExpires
         });
 
         await newUser.save();

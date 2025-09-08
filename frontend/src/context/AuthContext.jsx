@@ -87,13 +87,53 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem('token');
     
     if (storedUser && storedToken) {
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: {
-          user: JSON.parse(storedUser),
-          token: storedToken
+      try {
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            user: JSON.parse(storedUser),
+            token: storedToken
+          }
+        });
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        // Clear invalid data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    } else if (storedToken) {
+      // Token exists but no user data, try to fetch user data
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
+            dispatch({
+              type: 'LOGIN_SUCCESS',
+              payload: {
+                user: data.user,
+                token: storedToken
+              }
+            });
+          } else {
+            // Invalid token, clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
         }
-      });
+      };
+
+      fetchUserData();
     }
   }, []);
 
