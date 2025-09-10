@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, 
@@ -14,10 +15,12 @@ import {
   Share2,
   Eye,
   Star,
-  Navigation
+  Navigation,
+  List
 } from 'lucide-react';
 
 const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) => {
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
@@ -245,6 +248,17 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                       <button
                         onClick={(e) => { 
                           e.stopPropagation();
+                          navigate(`/itinerary/${trip.trip_id}`);
+                          setShowMenu(false); 
+                        }}
+                        className="flex items-center w-full px-5 py-3 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
+                      >
+                        <List className="w-5 h-5 mr-3 text-indigo-500" />
+                        Plan Itinerary
+                      </button>
+                      <button
+                        onClick={(e) => { 
+                          e.stopPropagation();
                           onView?.(trip); 
                           setShowMenu(false); 
                         }}
@@ -421,6 +435,18 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
           >
             <Eye className="w-5 h-5" />
             <span>View Trip</span>
+          </motion.button>
+          
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/itinerary/${trip.trip_id}`);
+            }}
+            className="px-4 py-4 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center hover:shadow-lg"
+            title="Plan Itinerary"
+          >
+            <List className="w-5 h-5" />
           </motion.button>
           
           <motion.button

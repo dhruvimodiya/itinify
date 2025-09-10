@@ -19,14 +19,22 @@ import {
 } from 'lucide-react';
 import { useTrips } from '../context/TripContext';
 import ModernTripCard from './ModernTripCard';
+import ModernTripForm from './ModernTripForm';
+import ModernTripDetails from './ModernTripDetails';
 import TripStats from './TripStats';
 
 const TripDashboard = () => {
-  const { trips, loading, fetchTrips, tripStats, fetchTripStats } = useTrips();
+  const { trips, loading, fetchTrips, tripStats, fetchTripStats, deleteTrip } = useTrips();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [viewMode, setViewMode] = useState('grid'); // grid or list
+  
+  // Modal states
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     fetchTrips();
@@ -66,6 +74,53 @@ const TripDashboard = () => {
         ease: "easeOut"
       }
     }
+  };
+
+  // Handler functions for trip actions
+  const handleEditTrip = (trip) => {
+    setSelectedTrip(trip);
+    setShowEditForm(true);
+  };
+
+  const handleDeleteTrip = (trip) => {
+    setSelectedTrip(trip);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleViewTrip = (trip) => {
+    setSelectedTrip(trip);
+    setShowDetails(true);
+  };
+
+  const confirmDeleteTrip = async () => {
+    if (selectedTrip) {
+      try {
+        await deleteTrip(selectedTrip.trip_id);
+        setShowDeleteConfirm(false);
+        setSelectedTrip(null);
+        // Refresh data
+        fetchTrips();
+        fetchTripStats();
+      } catch (error) {
+        console.error('Error deleting trip:', error);
+        // You might want to show a toast notification here
+      }
+    }
+  };
+
+  const handleFormSuccess = () => {
+    setShowEditForm(false);
+    setSelectedTrip(null);
+    // Refresh data
+    fetchTrips();
+    fetchTripStats();
+  };
+
+  const handleCloseModals = () => {
+    setShowEditForm(false);
+    setShowDetails(false);
+    setShowDeleteConfirm(false);
+    setSelectedTrip(null);
   };
 
   return (
@@ -322,7 +377,13 @@ const TripDashboard = () => {
               >
                 {filteredTrips.map((trip) => (
                   <motion.div key={trip.trip_id} variants={itemVariants}>
-                    <ModernTripCard trip={trip} />
+                    <ModernTripCard 
+                      trip={trip}
+                      onEdit={handleEditTrip}
+                      onDelete={handleDeleteTrip}
+                      onView={handleViewTrip}
+                      showActions={true}
+                    />
                   </motion.div>
                 ))}
               </motion.div>
@@ -443,6 +504,111 @@ const TripDashboard = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Edit Trip Modal */}
+      <AnimatePresence>
+        {showEditForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={handleCloseModals}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ModernTripForm
+                trip={selectedTrip}
+                onSuccess={handleFormSuccess}
+                onCancel={handleCloseModals}
+                isModal={true}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Trip Details Modal */}
+      <AnimatePresence>
+        {showDetails && selectedTrip && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={handleCloseModals}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ModernTripDetails
+                trip={selectedTrip}
+                onClose={handleCloseModals}
+                onEdit={() => {
+                  setShowDetails(false);
+                  setShowEditForm(true);
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && selectedTrip && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={handleCloseModals}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-8 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                  <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Trip</h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Are you sure you want to delete "{selectedTrip.destination}"? This action cannot be undone.
+                </p>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleCloseModals}
+                    className="flex-1 bg-gray-100 text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteTrip}
+                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
