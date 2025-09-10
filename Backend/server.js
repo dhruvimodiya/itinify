@@ -38,9 +38,11 @@ connectDB();
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const tripRoutes = require('./routes/tripRoutes');
+const itineraryRoutes = require('./routes/itineraryRoutes');
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/itinerary', itineraryRoutes);
 
 // cors origin settings
 app.use((req, res, next) => {

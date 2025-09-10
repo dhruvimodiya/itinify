@@ -71,6 +71,16 @@ function App() {
               <Route path="help" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900">Help & Support Coming Soon</h2></div>} />
             </Route>
             
+            {/* Standalone itinerary route outside of dashboard layout */}
+            <Route 
+              path="/itinerary/:tripId" 
+              element={
+                <ProtectedRoute>
+                  <ItineraryPage />
+                </ProtectedRoute>
+              } 
+            />
+            
             {/* Default Route - Redirect to login */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             
