@@ -13,7 +13,6 @@ import {
   BarChart3,
   CreditCard,
   Bell,
-  HelpCircle,
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
@@ -73,24 +72,24 @@ const Sidebar = ({ isOpen, onToggle }) => {
       id: 'trips',
       title: 'Trip Management',
       icon: MapPin,
-      expandable: true,
+      path: '/dashboard/trips',  
+      // expandable: true,
       children: [
-        { id: 'all-trips', title: 'All Trips', path: '/dashboard/trips' },
-        { id: 'upcoming', title: 'Upcoming Trips', path: '/dashboard/trips/upcoming' },
-        { id: 'ongoing', title: 'Ongoing Trips', path: '/dashboard/trips/ongoing' },
-        { id: 'completed', title: 'Completed Trips', path: '/dashboard/trips/completed' },
-        { id: 'create-trip', title: 'Create New Trip', path: '/dashboard/trips/create' },
+        // { id: 'all-trips', title: 'All Trips', path: '/dashboard/trips' },
+        // { id: 'upcoming', title: 'Upcoming Trips', path: '/dashboard/trips/upcoming' },
+        // { id: 'ongoing', title: 'Ongoing Trips', path: '/dashboard/trips/ongoing' },
+        // { id: 'completed', title: 'Completed Trips', path: '/dashboard/trips/completed' },
+        // { id: 'create-trip', title: 'Create New Trip', path: '/dashboard/trips/create' },
+        // { id: 'plan-trip', title: 'Plan Trip (Google Places)', path: '/dashboard/plan-trip' },
       ]
     },
-    {
-      id: 'itinerary',
-      title: 'Itinerary',
-      icon: Calendar,
-      path: '/dashboard/itinerary',
-      active: location.pathname.startsWith('/dashboard/itinerary'),
-      badge: 'Coming Soon',
-      disabled: true
-    },
+    // {
+    //   id: 'itinerary',
+    //   title: 'Itinerary Management',
+    //   icon: Calendar,
+    //   path: '/dashboard/itinerary',
+    //   active: location.pathname.startsWith('/dashboard/itinerary')
+    // },
     {
       id: 'expenses',
       title: 'Expenses',
@@ -133,13 +132,6 @@ const Sidebar = ({ isOpen, onToggle }) => {
       icon: Settings,
       path: '/dashboard/settings',
       active: location.pathname === '/dashboard/settings'
-    },
-    {
-      id: 'help',
-      title: 'Help & Support',
-      icon: HelpCircle,
-      path: '/dashboard/help',
-      active: location.pathname === '/dashboard/help'
     },
   ];
 

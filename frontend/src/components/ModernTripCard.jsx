@@ -16,7 +16,13 @@ import {
   Eye,
   Star,
   Navigation,
-  List
+  List,
+  Mountain,
+  Compass,
+  Map,
+  Backpack,
+  TreePine,
+  Sun
 } from 'lucide-react';
 
 const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) => {
@@ -71,40 +77,44 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
 
   const status = trip.status || getTripStatus();
 
-  // Get status colors
+  // Get status colors with travel-themed brown palette
   const getStatusColor = (status) => {
     switch (status) {
       case 'upcoming':
         return {
-          bg: 'bg-gradient-to-r from-blue-500 to-blue-600',
-          text: 'text-blue-700',
-          bgLight: 'bg-blue-50',
-          ring: 'ring-blue-200',
-          glow: 'shadow-blue-500/25'
+          bg: 'bg-gradient-to-r from-amber-600 to-yellow-600',
+          text: 'text-amber-800',
+          bgLight: 'bg-amber-50',
+          ring: 'ring-amber-200',
+          glow: 'shadow-amber-500/30',
+          icon: 'text-amber-600'
         };
       case 'ongoing':
         return {
-          bg: 'bg-gradient-to-r from-green-500 to-green-600',
-          text: 'text-green-700',
-          bgLight: 'bg-green-50',
-          ring: 'ring-green-200',
-          glow: 'shadow-green-500/25'
+          bg: 'bg-gradient-to-r from-emerald-600 to-teal-600',
+          text: 'text-emerald-800',
+          bgLight: 'bg-emerald-50',
+          ring: 'ring-emerald-200',
+          glow: 'shadow-emerald-500/30',
+          icon: 'text-emerald-600'
         };
       case 'completed':
         return {
-          bg: 'bg-gradient-to-r from-gray-500 to-gray-600',
-          text: 'text-gray-700',
-          bgLight: 'bg-gray-50',
-          ring: 'ring-gray-200',
-          glow: 'shadow-gray-500/25'
+          bg: 'bg-gradient-to-r from-stone-600 to-neutral-600',
+          text: 'text-stone-800',
+          bgLight: 'bg-stone-50',
+          ring: 'ring-stone-200',
+          glow: 'shadow-stone-500/30',
+          icon: 'text-stone-600'
         };
       default:
         return {
-          bg: 'bg-gradient-to-r from-gray-500 to-gray-600',
-          text: 'text-gray-700',
-          bgLight: 'bg-gray-50',
-          ring: 'ring-gray-200',
-          glow: 'shadow-gray-500/25'
+          bg: 'bg-gradient-to-r from-stone-600 to-neutral-600',
+          text: 'text-stone-800',
+          bgLight: 'bg-stone-50',
+          ring: 'ring-stone-200',
+          glow: 'shadow-stone-500/30',
+          icon: 'text-stone-600'
         };
     }
   };
@@ -177,9 +187,10 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
       whileHover="hover"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`group relative overflow-hidden rounded-3xl bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl ${statusColors.glow} transition-all duration-500`}
+      className={`group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl ${statusColors.glow} transition-all duration-500 cursor-pointer`}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)'
+        background: 'linear-gradient(135deg, #f5f1eb 0%, #ede3d3 50%, #e8dcc6 100%)',
+        border: '1px solid #d4c4a8'
       }}
     >
       {/* Background Image */}
@@ -190,31 +201,48 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
             backgroundImage: `url(${getDestinationImage(trip.destination)})`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-900/80 via-amber-800/40 to-transparent" />
+        
+        {/* Travel-themed decorative elements */}
+        <div className="absolute top-4 left-4">
+          <div className="flex space-x-2">
+            <div className="p-2 bg-amber-100/20 backdrop-blur-sm rounded-full">
+              <Compass className="w-4 h-4 text-amber-100" />
+            </div>
+            <div className="p-2 bg-amber-100/20 backdrop-blur-sm rounded-full">
+              <Mountain className="w-4 h-4 text-amber-100" />
+            </div>
+          </div>
+        </div>
         
         {/* Floating Elements */}
         <div className="absolute inset-0">
           {/* Status Badge */}
-          <div className="absolute top-6 left-6">
+          <div className="absolute top-6 right-6">
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className={`px-4 py-2 rounded-full text-sm font-semibold text-white ${statusColors.bg} shadow-lg backdrop-blur-sm border border-white/20`}
+              className={`px-4 py-2 rounded-full text-sm font-semibold text-white ${statusColors.bg} shadow-lg backdrop-blur-sm border border-amber-200/30`}
             >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+              <div className="flex items-center space-x-2">
+                {status === 'upcoming' && <Sun className="w-4 h-4" />}
+                {status === 'ongoing' && <Plane className="w-4 h-4" />}
+                {status === 'completed' && <Camera className="w-4 h-4" />}
+                <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+              </div>
             </motion.div>
           </div>
 
           {/* Favorite Button */}
-          <div className="absolute top-6 right-16">
+          <div className="absolute bottom-6 right-6">
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsFavorited(!isFavorited);
               }}
-              className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all duration-300"
+              className="p-3 bg-amber-100/20 backdrop-blur-sm rounded-full text-white hover:bg-amber-100/30 transition-all duration-300 border border-amber-200/30"
             >
               <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
             </motion.button>
@@ -222,7 +250,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
 
           {/* Action Menu */}
           {showActions && (
-            <div className="absolute top-6 right-6">
+            <div className="absolute top-6 left-6">
               <div className="relative">
                 <motion.button
                   whileTap={{ scale: 0.9 }}
@@ -230,7 +258,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                     e.stopPropagation();
                     setShowMenu(!showMenu);
                   }}
-                  className="p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all duration-300"
+                  className="p-3 bg-amber-100/20 backdrop-blur-sm rounded-full text-white hover:bg-amber-100/30 transition-all duration-300 border border-amber-200/30"
                 >
                   <MoreVertical className="w-5 h-5" />
                 </motion.button>
@@ -242,7 +270,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                       initial="hidden"
                       animate="visible"
                       exit="exit"
-                      className="absolute right-0 mt-3 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 py-3 z-50"
+                      className="absolute left-0 mt-3 w-56 bg-amber-50/95 backdrop-blur-xl rounded-2xl shadow-xl border border-amber-200/50 py-3 z-50"
                       style={{ backdropFilter: 'blur(20px)' }}
                     >
                       <button
@@ -251,9 +279,9 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                           navigate(`/itinerary/${trip.trip_id}`);
                           setShowMenu(false); 
                         }}
-                        className="flex items-center w-full px-5 py-3 text-sm text-gray-700 hover:bg-indigo-50 transition-colors"
+                        className="flex items-center w-full px-5 py-3 text-sm text-amber-800 hover:bg-amber-100/70 transition-colors"
                       >
-                        <List className="w-5 h-5 mr-3 text-indigo-500" />
+                        <List className="w-5 h-5 mr-3 text-amber-600" />
                         Plan Itinerary
                       </button>
                       <button
@@ -262,9 +290,9 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                           onView?.(trip); 
                           setShowMenu(false); 
                         }}
-                        className="flex items-center w-full px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                        className="flex items-center w-full px-5 py-3 text-sm text-amber-800 hover:bg-amber-100/70 transition-colors"
                       >
-                        <Eye className="w-5 h-5 mr-3 text-blue-500" />
+                        <Eye className="w-5 h-5 mr-3 text-amber-600" />
                         View Details
                       </button>
                       <button
@@ -273,33 +301,33 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                           onEdit?.(trip); 
                           setShowMenu(false); 
                         }}
-                        className="flex items-center w-full px-5 py-3 text-sm text-gray-700 hover:bg-purple-50 transition-colors"
+                        className="flex items-center w-full px-5 py-3 text-sm text-amber-800 hover:bg-amber-100/70 transition-colors"
                       >
-                        <Edit className="w-5 h-5 mr-3 text-purple-500" />
+                        <Edit className="w-5 h-5 mr-3 text-amber-600" />
                         Edit Trip
                       </button>
                       <button 
                         onClick={(e) => e.stopPropagation()}
-                        className="flex items-center w-full px-5 py-3 text-sm text-gray-700 hover:bg-green-50 transition-colors"
+                        className="flex items-center w-full px-5 py-3 text-sm text-amber-800 hover:bg-amber-100/70 transition-colors"
                       >
-                        <Navigation className="w-5 h-5 mr-3 text-green-500" />
+                        <Navigation className="w-5 h-5 mr-3 text-amber-600" />
                         Get Directions
                       </button>
                       <button 
                         onClick={(e) => e.stopPropagation()}
-                        className="flex items-center w-full px-5 py-3 text-sm text-gray-700 hover:bg-orange-50 transition-colors"
+                        className="flex items-center w-full px-5 py-3 text-sm text-amber-800 hover:bg-amber-100/70 transition-colors"
                       >
-                        <Share2 className="w-5 h-5 mr-3 text-orange-500" />
+                        <Share2 className="w-5 h-5 mr-3 text-amber-600" />
                         Share Trip
                       </button>
-                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="border-t border-amber-200 my-2"></div>
                       <button
                         onClick={(e) => { 
                           e.stopPropagation();
                           onDelete?.(trip); 
                           setShowMenu(false); 
                         }}
-                        className="flex items-center w-full px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center w-full px-5 py-3 text-sm text-red-600 hover:bg-red-50/70 transition-colors"
                       >
                         <Trash2 className="w-5 h-5 mr-3" />
                         Delete Trip
@@ -316,10 +344,10 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
             transition={{ duration: 0.3 }}
-            className="absolute bottom-6 left-6 right-6"
+            className="absolute bottom-6 left-6 right-20"
           >
             <div className="flex space-x-3">
-              <div className="flex-1 bg-white/20 backdrop-blur-lg rounded-xl p-3 border border-white/30">
+              <div className="flex-1 bg-amber-100/30 backdrop-blur-lg rounded-xl p-3 border border-amber-200/40">
                 <div className="flex items-center space-x-2 text-white">
                   <Calendar className="w-4 h-4" />
                   <span className="text-sm font-medium">
@@ -327,7 +355,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                   </span>
                 </div>
               </div>
-              <div className="flex-1 bg-white/20 backdrop-blur-lg rounded-xl p-3 border border-white/30">
+              <div className="flex-1 bg-amber-100/30 backdrop-blur-lg rounded-xl p-3 border border-amber-200/40">
                 <div className="flex items-center space-x-2 text-white">
                   <Clock className="w-4 h-4" />
                   <span className="text-sm font-medium">{getDuration()}</span>
@@ -339,7 +367,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-6" style={{ background: 'linear-gradient(135deg, #f5f1eb 0%, #ede3d3 100%)' }}>
         {/* Destination and Rating */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -347,42 +375,43 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors"
+              className="text-2xl font-bold text-amber-900 mb-2 group-hover:text-amber-700 transition-colors flex items-center gap-2"
             >
+              <Map className="w-6 h-6 text-amber-600" />
               {trip.destination}
             </motion.h3>
             <div className="flex items-center space-x-1">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                <Star key={i} className="w-4 h-4 text-amber-500 fill-current" />
               ))}
-              <span className="text-sm text-gray-500 ml-2">(4.8)</span>
+              <span className="text-sm text-amber-700 ml-2">(4.8)</span>
             </div>
           </div>
         </div>
 
         {/* Trip Stats */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200/50">
+          <div className="bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl p-4 border border-amber-300/50">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-500 rounded-lg">
+              <div className="p-2 bg-amber-600 rounded-lg">
                 <MapPin className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-xs text-gray-600 uppercase tracking-wide">Destination</p>
-                <p className="text-sm font-semibold text-gray-900">{trip.destination.split(',')[0]}</p>
+                <p className="text-xs text-amber-800 uppercase tracking-wide font-medium">Destination</p>
+                <p className="text-sm font-semibold text-amber-900">{trip.destination.split(',')[0]}</p>
               </div>
             </div>
           </div>
 
           {trip.total_budget && (
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200/50">
+            <div className="bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl p-4 border border-emerald-300/50">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-500 rounded-lg">
+                <div className="p-2 bg-emerald-600 rounded-lg">
                   <DollarSign className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-600 uppercase tracking-wide">Budget</p>
-                  <p className="text-sm font-semibold text-gray-900">{formatCurrency(trip.total_budget)}</p>
+                  <p className="text-xs text-emerald-800 uppercase tracking-wide font-medium">Budget</p>
+                  <p className="text-sm font-semibold text-emerald-900">{formatCurrency(trip.total_budget)}</p>
                 </div>
               </div>
             </div>
@@ -392,16 +421,19 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
         {/* Progress Indicator for Ongoing Trips */}
         {status === 'ongoing' && (
           <div className="mb-6">
-            <div className="flex justify-between text-sm text-gray-600 mb-3">
-              <span className="font-medium">Trip Progress</span>
+            <div className="flex justify-between text-sm text-amber-800 mb-3">
+              <span className="font-medium flex items-center gap-2">
+                <Backpack className="w-4 h-4" />
+                Trip Progress
+              </span>
               <span className="font-semibold">{Math.round(calculateProgress())}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-amber-200 rounded-full h-3 overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${calculateProgress()}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
-                className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full shadow-lg"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full shadow-lg"
               />
             </div>
           </div>
@@ -410,13 +442,17 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
         {/* Countdown for Upcoming Trips */}
         {status === 'upcoming' && (
           <div className="mb-6 text-center">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-4 text-white">
+            <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl p-4 text-white relative overflow-hidden">
+              <div className="absolute top-2 right-2">
+                <TreePine className="w-6 h-6 text-amber-200/50" />
+              </div>
               <div className="text-2xl font-bold">
                 {getDaysUntilStart() === 0 ? 'Starting Today!' : 
                  getDaysUntilStart() === 1 ? '1 Day to Go!' : 
                  `${getDaysUntilStart()} Days to Go!`}
               </div>
-              <div className="text-blue-100 text-sm mt-1">
+              <div className="text-amber-100 text-sm mt-1 flex items-center justify-center gap-2">
+                <Plane className="w-4 h-4" />
                 Until your adventure begins
               </div>
             </div>
@@ -431,7 +467,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
               e.stopPropagation();
               onView?.(trip);
             }}
-            className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+            className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-amber-700 hover:to-amber-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
           >
             <Eye className="w-5 h-5" />
             <span>View Trip</span>
@@ -443,7 +479,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
               e.stopPropagation();
               navigate(`/itinerary/${trip.trip_id}`);
             }}
-            className="px-4 py-4 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center hover:shadow-lg"
+            className="px-4 py-4 bg-gradient-to-r from-stone-600 to-stone-700 text-white rounded-xl font-semibold hover:from-stone-700 hover:to-stone-800 transition-all duration-300 flex items-center justify-center hover:shadow-lg"
             title="Plan Itinerary"
           >
             <List className="w-5 h-5" />
@@ -455,7 +491,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
               e.stopPropagation();
               onEdit?.(trip);
             }}
-            className="px-4 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all duration-300 flex items-center justify-center hover:shadow-lg"
+            className="px-4 py-4 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl transition-all duration-300 flex items-center justify-center hover:shadow-lg border border-amber-300"
           >
             <Edit className="w-5 h-5" />
           </motion.button>
@@ -467,11 +503,11 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
         initial={{ opacity: 0 }}
         animate={{ opacity: isHovered ? 1 : 0 }}
         transition={{ duration: 0.3 }}
-        className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-teal-600/5 pointer-events-none rounded-3xl"
+        className="absolute inset-0 bg-gradient-to-br from-amber-600/5 via-amber-800/5 to-stone-600/5 pointer-events-none rounded-3xl"
       />
 
-      {/* Glassmorphism Border Effect */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-white/20 via-transparent to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      {/* Travel-themed Border Effect */}
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-200/30 via-transparent to-amber-200/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
     </motion.div>
   );
 };

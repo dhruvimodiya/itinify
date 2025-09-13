@@ -58,15 +58,15 @@ const MainLayout = () => {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Bar */}
           <header className="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <button
+              {/* <button
                 onClick={toggleSidebar}
                 className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-all duration-200 ease-in-out hover:scale-105 active:scale-95"
                 title="Toggle Sidebar"
               >
                 <Menu className="h-5 w-5" />
-              </button>
+              </button> */}
               
               {/* Show title only on mobile when sidebar is closed */}
               <div className={`flex items-center space-x-2 lg:hidden ${sidebarOpen ? 'hidden' : 'flex'}`}>

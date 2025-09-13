@@ -148,13 +148,6 @@ const ItineraryPage = () => {
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
-            <button
-              onClick={handleBackToTrips}
-              className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <IoArrowBack className="h-5 w-5 mr-2" />
-              Back to Trips
-            </button>
             
             <div className="text-center flex-1 mx-8">
               <h1 className="text-2xl font-bold text-gray-900">{trip.destination}</h1>
