@@ -16,9 +16,9 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useTrips } from '../context/TripContext';
-import ModernTripCard from './ModernTripCard';
 import ModernTripForm from './ModernTripForm';
 import ModernTripDetails from './ModernTripDetails';
+import SimpleTripCard from './SimpleTripCard';
 
 const ModernTripManager = ({ initialView = 'dashboard', initialFilter = 'all' }) => {
   const {
@@ -339,7 +339,7 @@ const ModernTripManager = ({ initialView = 'dashboard', initialFilter = 'all' })
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {trips.slice(0, 3).map((trip) => (
-                    <ModernTripCard
+                    <SimpleTripCard
                       key={trip.trip_id}
                       trip={trip}
                       onEdit={handleEditTrip}
@@ -434,7 +434,7 @@ const ModernTripManager = ({ initialView = 'dashboard', initialFilter = 'all' })
               >
                 {filteredTrips.map((trip) => (
                   <motion.div key={trip.trip_id} variants={itemVariants}>
-                    <ModernTripCard
+                    <SimpleTripCard
                       trip={trip}
                       onEdit={handleEditTrip}
                       onDelete={handleDeleteTrip}

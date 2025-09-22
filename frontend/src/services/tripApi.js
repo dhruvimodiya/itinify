@@ -39,14 +39,24 @@ const tripApi = {
    */
   createTrip: async (tripData) => {
     try {
+      console.log('🔑 Auth token:', getAuthToken() ? 'Present' : 'Missing');
+      console.log('📤 Sending trip data:', tripData);
+      console.log('🌐 API URL:', API_BASE_URL);
+      
       const response = await fetch(API_BASE_URL, {
         method: 'POST',
         headers: createHeaders(),
         body: JSON.stringify(tripData),
       });
-      return await handleResponse(response);
+      
+      console.log('📊 Response status:', response.status);
+      console.log('📊 Response headers:', Object.fromEntries(response.headers));
+      
+      const result = await handleResponse(response);
+      console.log('📥 Final result:', result);
+      return result;
     } catch (error) {
-      console.error('Error creating trip:', error);
+      console.error('💥 Error creating trip:', error);
       throw error;
     }
   },
@@ -151,6 +161,25 @@ const tripApi = {
       return await handleResponse(response);
     } catch (error) {
       console.error('Error fetching trip stats:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Search for places using Google Places API
+   * @param {string} query - Search query for places
+   * @returns {Promise<Object>} Places search results
+   */
+  searchPlace: async (query) => {
+    try {
+      const queryParams = new URLSearchParams({ query });
+      const response = await fetch(`${API_BASE_URL}/search-place?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: createHeaders(),
+      });
+      return await handleResponse(response);
+    } catch (error) {
+      console.error('Error searching places:', error);
       throw error;
     }
   },

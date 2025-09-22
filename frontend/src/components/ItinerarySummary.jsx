@@ -1,4 +1,5 @@
 import React from 'react';
+import BudgetTracker from './BudgetTracker';
 import {
   IoCalendarOutline as CalendarDaysIcon,
   IoListOutline as ListBulletIcon,
@@ -9,7 +10,7 @@ import {
   IoAppsOutline as Squares2X2Icon
 } from 'react-icons/io5';
 
-const ItinerarySummary = ({ summary, trip, className = '' }) => {
+const ItinerarySummary = ({ summary, trip, tripBudget = 0, className = '' }) => {
   if (!summary) {
     return null;
   }
@@ -17,9 +18,11 @@ const ItinerarySummary = ({ summary, trip, className = '' }) => {
   const { daily_breakdown, overall_stats, category_breakdown } = summary;
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -51,6 +54,15 @@ const ItinerarySummary = ({ summary, trip, className = '' }) => {
 
   return (
     <div className={`space-y-6 ${className}`}>
+      {/* Budget Tracker */}
+      {tripBudget > 0 && (
+        <BudgetTracker 
+          totalBudget={tripBudget}
+          totalExpenses={overall_stats?.total_cost || 0}
+          showDetails={true}
+        />
+      )}
+      
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

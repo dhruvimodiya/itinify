@@ -11,6 +11,7 @@ import GoogleAuthCallback from './components/GoogleAuthCallback';
 import CompleteProfile from './components/CompleteProfile';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
+import PlaceSearchComponent from './components/PlaceSearchComponent';
 
 // Page Components
 import DashboardOverview from './pages/DashboardOverview';
@@ -60,7 +61,9 @@ function App() {
               <Route path="trips/upcoming" element={<TripsPage />} />
               <Route path="trips/ongoing" element={<TripsPage />} />
               <Route path="trips/completed" element={<TripsPage />} />
+              <Route path="plan-trip" element={<PlaceSearchComponent />} />
               <Route path="itinerary" element={<ItineraryPage />} />
+              <Route path="itinerary/:tripId" element={<ItineraryPage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
@@ -68,18 +71,7 @@ function App() {
               {/* Placeholder routes for future features */}
               <Route path="expenses" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900">Expenses Module Coming Soon</h2></div>} />
               <Route path="analytics" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900">Analytics Module Coming Soon</h2></div>} />
-              <Route path="help" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900">Help & Support Coming Soon</h2></div>} />
             </Route>
-            
-            {/* Standalone itinerary route outside of dashboard layout */}
-            <Route 
-              path="/itinerary/:tripId" 
-              element={
-                <ProtectedRoute>
-                  <ItineraryPage />
-                </ProtectedRoute>
-              } 
-            />
             
             {/* Default Route - Redirect to login */}
             <Route path="/" element={<Navigate to="/login" replace />} />

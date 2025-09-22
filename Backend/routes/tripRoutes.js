@@ -6,12 +6,19 @@ const {
   getTripById,
   updateTrip,
   deleteTrip,
-  getTripStats
+  getTripStats,
+  searchPlace
 } = require('../controllers/tripController');
 const { verifyToken } = require('../middleware/auth');
 
 // All trip routes require authentication
 router.use(verifyToken);
+
+// @route   GET /api/trips/search-place
+// @desc    Search for places using Google Places API
+// @access  Private
+// @query   query (required)
+router.get('/search-place', searchPlace);
 
 // @route   POST /api/trips
 // @desc    Create a new trip

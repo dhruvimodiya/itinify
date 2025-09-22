@@ -5,8 +5,7 @@ import {
   IoCashOutline as CurrencyDollarIcon,
   IoCheckboxOutline as CheckCircleIcon,
   IoPencilOutline as PencilIcon,
-  IoTrashOutline as TrashIcon,
-  IoMenuOutline as Bars3Icon
+  IoTrashOutline as TrashIcon
 } from 'react-icons/io5';
 import { IoCheckbox as CheckCircleIconSolid } from 'react-icons/io5';
 
@@ -17,7 +16,10 @@ const ItineraryDayView = ({
   onDelete, 
   onToggleCompletion,
   getCategoryColor,
-  getPriorityIcon 
+  getPriorityIcon,
+  tripBudget = 0,
+  totalTripExpenses = 0,
+  showBudgetWarning = true
 }) => {
   const formatTime = (timeString) => {
     if (!timeString) return null;
@@ -32,11 +34,25 @@ const ItineraryDayView = ({
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  // Calculate day expenses
+  const dayExpenses = items.reduce((total, item) => total + (item.cost || 0), 0);
+  
+  // Calculate budget status
+  const remainingBudget = tripBudget - totalTripExpenses;
+  const isOverBudget = totalTripExpenses > tripBudget;
+  const budgetUsagePercentage = tripBudget > 0 ? (totalTripExpenses / tripBudget) * 100 : 0;
+  
+  // Determine if this day's expenses push over budget
+  const willExceedBudget = (totalTripExpenses - dayExpenses + dayExpenses) > tripBudget;
+  const isHighExpenseDay = dayExpenses > (tripBudget * 0.2); // More than 20% of total budget in one day
 
   const getCategoryIcon = (category) => {
     const icons = {
@@ -68,145 +84,164 @@ const ItineraryDayView = ({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900">Day {day} Itinerary</h2>
-        <p className="text-sm text-gray-600 mt-1">{items.length} activities planned</p>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Clean Header */}
+      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Day {day}</h2>
+            <p className="text-sm text-gray-500">{items.length} activities</p>
+          </div>
+          
+          {/* Simple Day Total */}
+          <div className="text-right">
+            <div className="text-lg font-semibold text-gray-900">{formatCurrency(dayExpenses)}</div>
+            <div className="text-xs text-gray-500">today's cost</div>
+          </div>
+        </div>
+        
+        {/* Clean Budget Bar */}
+        {showBudgetWarning && tripBudget > 0 && (
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-gray-600">Trip Budget</span>
+              <span className={`font-medium ${isOverBudget ? 'text-red-600' : 'text-gray-700'}`}>
+                {formatCurrency(totalTripExpenses)} / {formatCurrency(tripBudget)}
+              </span>
+            </div>
+            <div className=" bg-gray-200 rounded-full h-2">
+              <div 
+                className={`h-2 rounded-full ${
+                  isOverBudget ? 'bg-red-500' : budgetUsagePercentage > 80 ? 'bg-yellow-500' : 'bg-green-500'
+                }`}
+                style={{ width: `${Math.min(budgetUsagePercentage, 100)}%` }}
+              />
+            </div>
+            {isOverBudget && (
+              <p className="text-xs text-red-600 mt-1">Over budget by {formatCurrency(totalTripExpenses - tripBudget)}</p>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="p-6 space-y-4">
+      {/* Clean Activity List */}
+      <div className="p-4 space-y-3">
         {items.map((item, index) => (
           <div
             key={item.itinerary_id}
-            className={`bg-white border border-gray-200 rounded-lg p-4 transition-all duration-200 hover:shadow-md hover:border-gray-300 ${
-              item.is_completed ? 'opacity-75 bg-gray-50' : ''
+            className={`border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow ${
+              item.is_completed ? 'bg-gray-50 opacity-80' : 'bg-white'
             }`}
           >
-            <div className="flex items-start space-x-4">
-              {/* Drag Handle - Visual only for now */}
-              <div className="flex-shrink-0 mt-1 text-gray-400 cursor-move">
-                <Bars3Icon className="h-5 w-5" />
-              </div>
-
-              {/* Completion Toggle */}
+            <div className="flex items-start gap-3">
+              {/* Completion Checkbox */}
               <button
                 onClick={() => onToggleCompletion(item.itinerary_id)}
                 className="flex-shrink-0 mt-1"
               >
                 {item.is_completed ? (
-                  <CheckCircleIconSolid className="h-6 w-6 text-green-600" />
+                  <CheckCircleIconSolid className="h-5 w-5 text-green-600" />
                 ) : (
-                  <CheckCircleIcon className="h-6 w-6 text-gray-400 hover:text-green-600 transition-colors" />
+                  <CheckCircleIcon className="h-5 w-5 text-gray-400 hover:text-green-600 transition-colors" />
                 )}
               </button>
 
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            {/* Activity Title */}
-                            <div className="flex items-center space-x-2 mb-2">
-                              <span className="text-lg">
-                                {getCategoryIcon(item.category)}
-                              </span>
-                              <h3 className={`text-lg font-semibold ${
-                                item.is_completed 
-                                  ? 'line-through text-gray-500' 
-                                  : 'text-gray-900'
-                              }`}>
-                                {item.activity}
-                              </h3>
-                              {getPriorityIcon(item.priority)}
-                            </div>
-
-                            {/* Description */}
-                            {item.description && (
-                              <p className="text-gray-600 mb-3 leading-relaxed">
-                                {item.description}
-                              </p>
-                            )}
-
-                            {/* Details Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                              {/* Time */}
-                              {(item.start_time || item.end_time) && (
-                                <div className="flex items-center text-sm text-gray-600">
-                                  <ClockIcon className="h-4 w-4 mr-2 text-gray-400" />
-                                  <span>
-                                    {item.start_time && formatTime(item.start_time)}
-                                    {item.start_time && item.end_time && ' - '}
-                                    {item.end_time && formatTime(item.end_time)}
-                                  </span>
-                                </div>
-                              )}
-
-                              {/* Location */}
-                              {item.location && (
-                                <div className="flex items-center text-sm text-gray-600">
-                                  <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
-                                  <span className="truncate">{item.location}</span>
-                                </div>
-                              )}
-
-                              {/* Cost */}
-                              {item.cost > 0 && (
-                                <div className="flex items-center text-sm text-gray-600">
-                                  <CurrencyDollarIcon className="h-4 w-4 mr-2 text-gray-400" />
-                                  <span>{formatCurrency(item.cost)}</span>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Category Badge */}
-                            <div className="flex items-center space-x-2">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${getCategoryColor(item.category)}-100 text-${getCategoryColor(item.category)}-800`}>
-                                {item.category}
-                              </span>
-                              
-                              {item.priority !== 'medium' && (
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  item.priority === 'high' 
-                                    ? 'bg-red-100 text-red-800' 
-                                    : 'bg-green-100 text-green-800'
-                                }`}>
-                                  {item.priority} priority
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Notes */}
-                            {item.notes && (
-                              <div className="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                                <p className="text-sm text-yellow-800">
-                                  <span className="font-medium">Note:</span> {item.notes}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex items-center space-x-2 ml-4">
-                            <button
-                              onClick={() => onEdit(item)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Edit activity"
-                            >
-                              <PencilIcon className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => onDelete(item.itinerary_id)}
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Delete activity"
-                            >
-                              <TrashIcon className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              {/* Activity Content */}
+              <div className="flex-1 min-w-0">
+                {/* Title Row */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">{getCategoryIcon(item.category)}</span>
+                    <h3 className={`text-base font-medium ${
+                      item.is_completed ? 'line-through text-gray-500' : 'text-gray-900'
+                    }`}>
+                      {item.activity}
+                    </h3>
                   </div>
-                ))}
+                  
+                  {/* Cost */}
+                  {item.cost > 0 && (
+                    <span className={`text-sm font-medium px-2 py-1 rounded ${
+                      item.cost > (tripBudget * 0.1) 
+                        ? 'bg-red-100 text-red-700' 
+                        : item.cost > (tripBudget * 0.05)
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {formatCurrency(item.cost)}
+                    </span>
+                  )}
+                </div>
+
+                {/* Details Row */}
+                <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                  {/* Time */}
+                  {(item.start_time || item.end_time) && (
+                    <div className="flex items-center gap-1">
+                      <ClockIcon className="h-4 w-4" />
+                      <span>
+                        {item.start_time && formatTime(item.start_time)}
+                        {item.start_time && item.end_time && ' - '}
+                        {item.end_time && formatTime(item.end_time)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Location */}
+                  {item.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPinIcon className="h-4 w-4" />
+                      <span className="truncate">{item.location}</span>
+                    </div>
+                  )}
+
+                  {/* Category */}
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                    {item.category}
+                  </span>
+                </div>
+
+                {/* Description */}
+                {item.description && (
+                  <p className="text-sm text-gray-600 mb-2">{item.description}</p>
+                )}
+
+                {/* Notes */}
+                {item.notes && (
+                  <div className="text-xs bg-yellow-50 text-yellow-800 p-2 rounded border border-yellow-200">
+                    <strong>Note:</strong> {item.notes}
+                  </div>
+                )}
+
+                {/* High Cost Warning */}
+                {item.cost > 0 && showBudgetWarning && tripBudget > 0 && item.cost > (tripBudget * 0.1) && (
+                  <div className="text-xs bg-red-50 text-red-700 p-2 rounded border border-red-200 mt-2">
+                    High cost item - {((item.cost / tripBudget) * 100).toFixed(0)}% of budget
+                  </div>
+                )}
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-1">
+                <button
+                  onClick={() => onEdit(item)}
+                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  title="Edit"
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(item.itinerary_id)}
+                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                  title="Delete"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
             </div>
           );
         };

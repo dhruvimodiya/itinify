@@ -149,6 +149,19 @@ const ItineraryManager = ({ tripId, trip }) => {
     return days;
   };
 
+  // Calculate total trip expenses from all itinerary items
+  const calculateTotalTripExpenses = () => {
+    let total = 0;
+    Object.values(itinerary).forEach(dayItems => {
+      if (Array.isArray(dayItems)) {
+        dayItems.forEach(item => {
+          total += (item.cost || 0);
+        });
+      }
+    });
+    return total;
+  };
+
   const getTotalActivities = () => {
     return Object.values(itinerary).reduce((total, dayItems) => total + dayItems.length, 0);
   };
@@ -353,6 +366,7 @@ const ItineraryManager = ({ tripId, trip }) => {
         <ItinerarySummary 
           summary={summary}
           trip={trip}
+          tripBudget={trip?.total_budget || 0}
           className="mb-6"
         />
       )}
@@ -416,6 +430,9 @@ const ItineraryManager = ({ tripId, trip }) => {
             onToggleCompletion={handleToggleCompletion}
             getCategoryColor={getCategoryColor}
             getPriorityIcon={getPriorityIcon}
+            tripBudget={trip?.total_budget || 0}
+            totalTripExpenses={calculateTotalTripExpenses()}
+            showBudgetWarning={true}
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
