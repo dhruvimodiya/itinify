@@ -54,9 +54,9 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
 
   // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -276,7 +276,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
                       <button
                         onClick={(e) => { 
                           e.stopPropagation();
-                          navigate(`/itinerary/${trip.trip_id}`);
+                          navigate(`/dashboard/itinerary/${trip.trip_id}`);
                           setShowMenu(false); 
                         }}
                         className="flex items-center w-full px-5 py-3 text-sm text-amber-800 hover:bg-amber-100/70 transition-colors"
@@ -477,7 +477,7 @@ const ModernTripCard = ({ trip, onEdit, onDelete, onView, showActions = true }) 
             whileTap={{ scale: 0.95 }}
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/itinerary/${trip.trip_id}`);
+              navigate(`/dashboard/itinerary/${trip.trip_id}`);
             }}
             className="px-4 py-4 bg-gradient-to-r from-stone-600 to-stone-700 text-white rounded-xl font-semibold hover:from-stone-700 hover:to-stone-800 transition-all duration-300 flex items-center justify-center hover:shadow-lg"
             title="Plan Itinerary"

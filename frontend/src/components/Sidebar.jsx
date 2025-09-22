@@ -7,8 +7,6 @@ import {
   User,
   Settings,
   LogOut,
-  Menu,
-  X,
   Calendar,
   BarChart3,
   CreditCard,
@@ -17,36 +15,12 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-const Sidebar = ({ isOpen, onToggle }) => {
+const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
   const [expandedSections, setExpandedSections] = useState({});
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Handle overlay animation timing
-  useEffect(() => {
-    if (isOpen) {
-      setShowOverlay(true);
-      setIsAnimating(true);
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => setShowOverlay(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+  const [navigationItems, setNavigationItems] = useState([]);
 
   const handleLogout = () => {
     logout();
@@ -60,80 +34,174 @@ const Sidebar = ({ isOpen, onToggle }) => {
     }));
   };
 
-  const navigationItems = [
-    {
-      id: 'overview',
-      title: 'Overview',
-      icon: Home,
-      path: '/dashboard',
-      active: location.pathname === '/dashboard'
-    },
-    {
+  // Generate dynamic navigation based on user permissions and features
+  useEffect(() => {
+    const dynamicNavigation = generateNavigationItems();
+    const dynamicBottomItems = generateBottomItems();
+    setNavigationItems(dynamicNavigation);
+    setBottomItems(dynamicBottomItems);
+  }, [user, location.pathname]);
+
+  // Helper state for bottom items
+  const [bottomItems, setBottomItems] = useState([]);
+
+  // Generate navigation items based on user role, permissions, and available features
+  const generateNavigationItems = () => {
+    const baseItems = [
+      {
+        id: 'overview',
+        title: 'Overview',
+        icon: Home,
+        path: '/dashboard',
+        active: location.pathname === '/dashboard',
+        visible: true
+      }
+    ];
+
+    // Trip management - always available for authenticated users
+    const tripManagement = {
       id: 'trips',
       title: 'Trip Management',
       icon: MapPin,
-      path: '/dashboard/trips',  
-      // expandable: true,
-      children: [
-        // { id: 'all-trips', title: 'All Trips', path: '/dashboard/trips' },
-        // { id: 'upcoming', title: 'Upcoming Trips', path: '/dashboard/trips/upcoming' },
-        // { id: 'ongoing', title: 'Ongoing Trips', path: '/dashboard/trips/ongoing' },
-        // { id: 'completed', title: 'Completed Trips', path: '/dashboard/trips/completed' },
-        // { id: 'create-trip', title: 'Create New Trip', path: '/dashboard/trips/create' },
-        // { id: 'plan-trip', title: 'Plan Trip (Google Places)', path: '/dashboard/plan-trip' },
-      ]
-    },
-    // {
-    //   id: 'itinerary',
-    //   title: 'Itinerary Management',
-    //   icon: Calendar,
-    //   path: '/dashboard/itinerary',
-    //   active: location.pathname.startsWith('/dashboard/itinerary')
-    // },
-    {
-      id: 'expenses',
-      title: 'Expenses',
-      icon: CreditCard,
-      path: '/dashboard/expenses',
-      active: location.pathname.startsWith('/dashboard/expenses'),
-      badge: 'Coming Soon',
-      disabled: true
-    },
-    {
-      id: 'analytics',
-      title: 'Analytics',
-      icon: BarChart3,
-      path: '/dashboard/analytics',
-      active: location.pathname.startsWith('/dashboard/analytics'),
-      badge: 'Coming Soon',
-      disabled: true
-    },
-  ];
+      path: '/dashboard/trips',
+      active: location.pathname.startsWith('/dashboard/trips'),
+      visible: !!user,
+      children: getTripSubNavigation()
+    };
 
-  const bottomItems = [
-    {
-      id: 'notifications',
-      title: 'Notifications',
-      icon: Bell,
-      path: '/dashboard/notifications',
-      active: location.pathname === '/dashboard/notifications',
-      badge: '3'
-    },
-    {
-      id: 'profile',
-      title: 'Profile',
-      icon: User,
-      path: '/dashboard/profile',
-      active: location.pathname === '/dashboard/profile'
-    },
-    {
-      id: 'settings',
-      title: 'Settings',
-      icon: Settings,
-      path: '/dashboard/settings',
-      active: location.pathname === '/dashboard/settings'
-    },
-  ];
+    // Dynamic feature-based navigation
+    const featureItems = [];
+
+    // Expenses - show if user has trips or is premium
+    if (user && (hasUserTrips() || isPremiumUser())) {
+      featureItems.push({
+        id: 'expenses',
+        title: 'Expenses',
+        icon: CreditCard,
+        path: '/dashboard/expenses',
+        active: location.pathname.startsWith('/dashboard/expenses'),
+        badge: hasUserTrips() ? null : 'Coming Soon',
+        disabled: !hasUserTrips(),
+        visible: true
+      });
+    }
+
+    // Analytics - show for users with multiple trips
+    if (user && getUserTripCount() > 1) {
+      featureItems.push({
+        id: 'analytics',
+        title: 'Analytics',
+        icon: BarChart3,
+        path: '/dashboard/analytics',
+        active: location.pathname.startsWith('/dashboard/analytics'),
+        badge: getUserTripCount() > 5 ? 'Premium' : 'New',
+        disabled: false,
+        visible: true
+      });
+    } else if (user) {
+      // Show disabled analytics for users with few trips
+      featureItems.push({
+        id: 'analytics',
+        title: 'Analytics',
+        icon: BarChart3,
+        path: '/dashboard/analytics',
+        active: location.pathname.startsWith('/dashboard/analytics'),
+        badge: 'Coming Soon',
+        disabled: true,
+        visible: true
+      });
+    }
+
+    // Filter by visibility
+    return [...baseItems, tripManagement, ...featureItems]
+      .filter(item => item.visible);
+  };
+
+  // Generate bottom navigation items
+  const generateBottomItems = () => {
+    const items = [];
+
+    // Notifications - show if user has them enabled
+    if (user && hasNotificationsEnabled()) {
+      items.push({
+        id: 'notifications',
+        title: 'Notifications',
+        icon: Bell,
+        path: '/dashboard/notifications',
+        active: location.pathname === '/dashboard/notifications',
+        badge: getNotificationCount()
+      });
+    }
+
+    // Profile - always show for authenticated users
+    if (user) {
+      items.push({
+        id: 'profile',
+        title: 'Profile',
+        icon: User,
+        path: '/dashboard/profile',
+        active: location.pathname === '/dashboard/profile'
+      });
+    }
+
+    return items;
+  };
+
+  // Dynamic trip sub-navigation based on user's trip data
+  const getTripSubNavigation = () => {
+    const subItems = [];
+    
+    if (hasUpcomingTrips()) {
+      subItems.push({ id: 'upcoming', title: 'Upcoming Trips', path: '/dashboard/trips/upcoming' });
+    }
+    
+    if (hasOngoingTrips()) {
+      subItems.push({ id: 'ongoing', title: 'Ongoing Trips', path: '/dashboard/trips/ongoing' });
+    }
+    
+    if (hasCompletedTrips()) {
+      subItems.push({ id: 'completed', title: 'Completed Trips', path: '/dashboard/trips/completed' });
+    }
+
+    // Always show create option
+    subItems.push({ id: 'create-trip', title: 'Create New Trip', path: '/dashboard/trips/create' });
+
+    return subItems;
+  };
+
+  // Helper functions to determine user capabilities dynamically
+  const hasUserTrips = () => {
+    return user?.tripCount > 0 || false;
+  };
+
+  const isPremiumUser = () => {
+    return user?.subscription === 'premium' || user?.role === 'premium';
+  };
+
+  const getUserTripCount = () => {
+    return user?.tripCount || 0;
+  };
+
+  const hasNotificationsEnabled = () => {
+    return user?.preferences?.notifications !== false;
+  };
+
+  const getNotificationCount = () => {
+    const count = user?.unreadNotifications || 0;
+    return count > 0 ? count.toString() : null;
+  };
+
+  const hasUpcomingTrips = () => {
+    return user?.upcomingTrips > 0 || false;
+  };
+
+  const hasOngoingTrips = () => {
+    return user?.ongoingTrips > 0 || false;
+  };
+
+  const hasCompletedTrips = () => {
+    return user?.completedTrips > 0 || false;
+  };
 
   const handleNavigation = (item) => {
     if (item.disabled) return;
@@ -142,12 +210,6 @@ const Sidebar = ({ isOpen, onToggle }) => {
       toggleSection(item.id);
     } else if (item.path) {
       navigate(item.path);
-      // Close sidebar on mobile after navigation with slight delay for visual feedback
-      if (window.innerWidth < 1024) {
-        setTimeout(() => {
-          onToggle();
-        }, 150);
-      }
     }
   };
 
@@ -230,14 +292,6 @@ const Sidebar = ({ isOpen, onToggle }) => {
                 <p className="text-xs text-gray-500">Travel Planner</p>
               </div>
             </div>
-            
-            {/* Close button for mobile */}
-            <button
-              onClick={onToggle}
-              className="lg:hidden p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-all duration-200 ease-in-out hover:scale-110 active:scale-95"
-            >
-              <X className="h-5 w-5" />
-            </button>
           </div>
 
           {/* User Profile Section */}

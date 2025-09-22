@@ -45,7 +45,7 @@ const ItineraryPage = () => {
   };
 
   const handleBackToTrips = () => {
-    navigate('/trips');
+    navigate('/dashboard/trips');
   };
 
   const formatDate = (dateString) => {
@@ -59,7 +59,7 @@ const ItineraryPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -77,7 +77,7 @@ const ItineraryPage = () => {
     };
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="h-full">
         {/* Demo Warning Banner */}
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
           <div className="flex">
@@ -120,14 +120,16 @@ const ItineraryPage = () => {
         </div>
 
         {/* Demo Itinerary Manager */}
-        <ItineraryManager tripId={tripId} trip={demoTrip} />
+        <div className="p-6">
+          <ItineraryManager tripId={tripId} trip={demoTrip} />
+        </div>
       </div>
     );
   }
 
   if (!trip) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-900">Trip not found</h3>
           <button
@@ -143,11 +145,18 @@ const ItineraryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-full">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
+            <button
+              onClick={handleBackToTrips}
+              className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <IoArrowBack className="h-5 w-5 mr-2" />
+              Back to Trips
+            </button>
             
             <div className="text-center flex-1 mx-8">
               <h1 className="text-2xl font-bold text-gray-900">{trip.destination}</h1>
@@ -172,9 +181,9 @@ const ItineraryPage = () => {
       </div>
 
       {/* Main Content */}
-      <main className="py-6">
+      <div className="p-6">
         <ItineraryManager tripId={tripId} trip={trip} />
-      </main>
+      </div>
     </div>
   );
 };

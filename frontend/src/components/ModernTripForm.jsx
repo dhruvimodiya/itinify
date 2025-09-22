@@ -19,6 +19,7 @@ import {
   Plane
 } from 'lucide-react';
 import { useTrips } from '../context/TripContext';
+import PlaceSearchComponent from './PlaceSearchComponent';
 
 const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) => {
   const { createTrip, updateTrip, loading, error, clearError } = useTrips();
@@ -33,6 +34,8 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
   const [validationErrors, setValidationErrors] = useState({});
   const [isAIAssisting, setIsAIAssisting] = useState(false);
   const [budgetSuggestions, setBudgetSuggestions] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [popularDestinations, setPopularDestinations] = useState([]);
 
   // Initialize form data if editing existing trip
   useEffect(() => {
@@ -59,14 +62,170 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
     }
   }, [formData.destination, formData.start_date, formData.end_date]);
 
+  // Initialize dynamic popular destinations
+  useEffect(() => {
+    loadPopularDestinations();
+  }, []);
+
+  // Dynamic popular destinations based on current trends, user data, or API
+  const loadPopularDestinations = async () => {
+    try {
+      // Option 1: Fetch from backend API (recommended)
+      // const response = await fetch('/api/destinations/popular');
+      // const data = await response.json();
+      // setPopularDestinations(data.destinations || []);
+      
+      // Option 2: Generate based on user's location, season, or trends
+      const dynamicDestinations = generateContextualDestinations();
+      setPopularDestinations(dynamicDestinations);
+    } catch (error) {
+      console.log('Using fallback destinations');
+      setPopularDestinations(generateFallbackDestinations());
+    }
+  };
+
+  // Generate contextual destinations based on current context
+  const generateContextualDestinations = () => {
+    const currentMonth = new Date().getMonth();
+    const currentSeason = getSeason(currentMonth);
+    const userLanguage = navigator.language || 'en-US';
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    // Generate destinations based on season, location, and trends
+    const seasonalDestinations = getSeasonalDestinations(currentSeason);
+    const regionalDestinations = getRegionalDestinations(userTimezone);
+    const trendingDestinations = getTrendingDestinations();
+    
+    // Combine and randomize
+    const allDestinations = [...seasonalDestinations, ...regionalDestinations, ...trendingDestinations];
+    return shuffleArray(allDestinations).slice(0, 8);
+  };
+
+  // Get seasonal destination suggestions
+  const getSeasonalDestinations = (season) => {
+    const seasonalMap = {
+      'winter': ['Dubai, UAE', 'Thailand', 'Goa, India', 'Singapore'],
+      'spring': ['Japan', 'Netherlands', 'Turkey', 'Nepal'],
+      'summer': ['Europe', 'Scandinavia', 'Canada', 'Russia'],
+      'autumn': ['New England, USA', 'Germany', 'South Korea', 'China']
+    };
+    return seasonalMap[season] || [];
+  };
+
+  // Get regional destinations based on timezone
+  const getRegionalDestinations = (timezone) => {
+    if (timezone.includes('Asia')) {
+      return ['Southeast Asia', 'Japan', 'South Korea', 'Indonesia'];
+    } else if (timezone.includes('Europe')) {
+      return ['Mediterranean', 'Scandinavia', 'Eastern Europe', 'UK'];
+    } else if (timezone.includes('America')) {
+      return ['Central America', 'South America', 'Caribbean', 'Canada'];
+    }
+    return ['Australia', 'New Zealand', 'Pacific Islands', 'Africa'];
+  };
+
+  // Get currently trending destinations (could be from API)
+  const getTrendingDestinations = () => {
+    const trending = [
+      'Portugal', 'Georgia', 'Vietnam', 'Morocco',
+      'Peru', 'Iceland', 'Sri Lanka', 'Jordan'
+    ];
+    return shuffleArray(trending).slice(0, 4);
+  };
+
+  // Generate fallback destinations if all else fails
+  const generateFallbackDestinations = () => {
+    const fallbacks = [
+      'Local Destination', 'Nearby City', 'Regional Capital',
+      'National Park', 'Historical Site', 'Cultural Center'
+    ];
+    return fallbacks;
+  };
+
+  // Utility functions
+  const getSeason = (month) => {
+    if (month >= 2 && month <= 4) return 'spring';
+    if (month >= 5 && month <= 7) return 'summer';
+    if (month >= 8 && month <= 10) return 'autumn';
+    return 'winter';
+  };
+
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Dynamic budget suggestions based on destination data and current rates
   const generateBudgetSuggestions = () => {
     const duration = calculateDuration();
+    if (duration <= 0) return;
+
+    // Get dynamic base cost based on destination and selected place data
+    const baseCost = calculateBaseCost();
+    
     const suggestions = [
-      { label: 'Budget', amount: duration * 100, description: 'Basic accommodation & meals' },
-      { label: 'Comfort', amount: duration * 200, description: 'Mid-range hotels & dining' },
-      { label: 'Luxury', amount: duration * 400, description: 'Premium experiences' }
+      { 
+        label: 'Budget', 
+        amount: Math.round(duration * baseCost * 0.8), 
+        description: 'Basic accommodation & local transport' 
+      },
+      { 
+        label: 'Comfort', 
+        amount: Math.round(duration * baseCost * 1.5), 
+        description: 'Mid-range hotels & comfortable travel' 
+      },
+      { 
+        label: 'Luxury', 
+        amount: Math.round(duration * baseCost * 3.0), 
+        description: 'Premium experiences & luxury stays' 
+      }
     ];
     setBudgetSuggestions(suggestions);
+  };
+
+  // Calculate base cost per day based on destination and place data
+  const calculateBaseCost = () => {
+    let baseCost = 100; // Default base cost per day
+    
+    // Adjust based on selected place data
+    if (selectedPlace) {
+      // Use place price level to adjust base cost
+      const priceLevelMultipliers = [0.5, 1.0, 1.5, 2.0, 3.0]; // For price levels 0-4
+      const multiplier = priceLevelMultipliers[selectedPlace.price_level] || 1.0;
+      baseCost = Math.round(baseCost * multiplier);
+      
+      // Adjust based on place type
+      const typeMultipliers = {
+        'country': 0.8,
+        'city_center': 1.3,
+        'luxury': 2.0,
+        'resort': 2.5,
+        'hotel': 1.2,
+        'beach': 1.1,
+        'mountain': 0.9,
+        'rural': 0.7
+      };
+      
+      if (selectedPlace.type && typeMultipliers[selectedPlace.type]) {
+        baseCost = Math.round(baseCost * typeMultipliers[selectedPlace.type]);
+      }
+    }
+    
+    // Adjust based on destination region (from form data)
+    const destination = formData.destination.toLowerCase();
+    if (destination.includes('europe') || destination.includes('switzerland') || destination.includes('norway')) {
+      baseCost = Math.round(baseCost * 1.8);
+    } else if (destination.includes('asia') || destination.includes('india') || destination.includes('thailand')) {
+      baseCost = Math.round(baseCost * 0.6);
+    } else if (destination.includes('america') || destination.includes('usa') || destination.includes('canada')) {
+      baseCost = Math.round(baseCost * 1.4);
+    }
+    
+    return Math.max(50, baseCost); // Minimum $50 per day
   };
 
   const calculateDuration = () => {
@@ -83,6 +242,19 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleDestinationChange = (destinationName, placeData = null) => {
+    console.log('🏠 ModernTripForm - Destination changed:', destinationName);
+    console.log('📍 ModernTripForm - Place data received:', placeData);
+    
+    setFormData(prev => ({
+      ...prev,
+      destination: destinationName,
+    }));
+    setSelectedPlace(placeData);
+    
+    console.log('✅ ModernTripForm - State updated, selectedPlace:', placeData);
   };
 
   const validateForm = () => {
@@ -130,6 +302,15 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
         total_budget: formData.total_budget ? parseFloat(formData.total_budget) : null,
       };
 
+      // Add place-specific data if available
+      if (selectedPlace) {
+        tripData.place_id = selectedPlace.place_id;
+        tripData.address = selectedPlace.address;
+        tripData.coordinates = selectedPlace.coordinates;
+        tripData.rating = selectedPlace.rating;
+        tripData.place_type = selectedPlace.type;
+      }
+
       if (trip) {
         await updateTrip(trip.trip_id, tripData);
       } else {
@@ -158,11 +339,6 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
-
-  const popularDestinations = [
-    'Paris, France', 'Tokyo, Japan', 'New York, USA', 'London, UK',
-    'Bali, Indonesia', 'Barcelona, Spain', 'Sydney, Australia', 'Dubai, UAE'
-  ];
 
   return (
     <motion.div
@@ -218,21 +394,15 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
                 <MapPin className="inline w-4 h-4 mr-2" />
                 Where are you going?
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="destination"
-                  value={formData.destination}
-                  onChange={handleInputChange}
-                  placeholder="Enter your dream destination..."
-                  className={`w-full px-4 py-4 bg-white/80 border-2 rounded-xl focus:outline-none transition-all duration-200 ${
-                    validationErrors.destination
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-amber-200 focus:border-amber-500'
-                  }`}
-                />
-                <Globe className="absolute right-4 top-1/2 transform -translate-y-1/2 text-amber-600 w-5 h-5" />
-              </div>
+              
+              <PlaceSearchComponent
+                value={formData.destination}
+                onChange={handleDestinationChange}
+                placeholder="Enter your dream destination..."
+                className={validationErrors.destination ? 'border-red-300' : ''}
+                showDetails={false}
+              />
+              
               {validationErrors.destination && (
                 <p className="mt-2 text-sm text-red-600 flex items-center">
                   <AlertCircle className="w-4 h-4 mr-1" />
@@ -251,7 +421,7 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
                     <button
                       key={dest}
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, destination: dest }))}
+                      onClick={() => handleDestinationChange(dest)}
                       className="px-3 py-1 text-sm bg-amber-100 text-amber-800 rounded-full hover:bg-amber-200 transition-colors border border-amber-300"
                     >
                       {dest}
@@ -391,6 +561,48 @@ const ModernTripForm = ({ trip = null, onSuccess, onCancel, isModal = false }) =
                         <p className="text-sm text-amber-800">{suggestion.description}</p>
                       </button>
                     ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Selected Place Details */}
+            {selectedPlace && (
+              <motion.div variants={itemVariants}>
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-amber-900 mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-blue-600" />
+                    Selected Destination Details
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-amber-800">Place Name:</span>
+                      <span className="font-medium text-amber-900">{selectedPlace.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-amber-800">Address:</span>
+                      <span className="font-medium text-amber-900 text-right max-w-xs truncate">{selectedPlace.address}</span>
+                    </div>
+                    {selectedPlace.rating && (
+                      <div className="flex justify-between">
+                        <span className="text-amber-800">Rating:</span>
+                        <span className="font-medium text-amber-900 flex items-center gap-1">
+                          ⭐ {selectedPlace.rating}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-amber-800">Type:</span>
+                      <span className="font-medium text-amber-900 capitalize">{selectedPlace.type}</span>
+                    </div>
+                    {selectedPlace.coordinates && (
+                      <div className="flex justify-between">
+                        <span className="text-amber-800">Coordinates:</span>
+                        <span className="font-medium text-blue-700 text-sm">
+                          {selectedPlace.coordinates.lat.toFixed(4)}, {selectedPlace.coordinates.lng.toFixed(4)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

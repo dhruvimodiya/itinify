@@ -24,7 +24,9 @@ import {
   Sun
 } from 'lucide-react';
 import { useTrips } from '../context/TripContext';
-import ModernTripCard from './ModernTripCard';
+import SimpleTripCard from './SimpleTripCard';
+import TripTable from './TripTable';
+import ViewToggle from './ViewToggle';
 import ModernTripForm from './ModernTripForm';
 import ModernTripDetails from './ModernTripDetails';
 import TripStats from './TripStats';
@@ -34,7 +36,7 @@ const TripDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [viewMode, setViewMode] = useState('grid'); // grid or list
+  const [viewMode, setViewMode] = useState('card'); // card, table
   
   // Modal states
   const [showEditForm, setShowEditForm] = useState(false);
@@ -138,79 +140,6 @@ const TripDashboard = () => {
     <div className="min-h-screen" style={{
       background: 'linear-gradient(135deg, #f5f1eb 0%, #ede3d3 50%, #e8dcc6 100%)'
     }}>
-      {/* Hero Section */}
-      <div className="relative overflow-hidden h-96 bg-gradient-to-r from-amber-800 via-orange-600 to-amber-800">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url("https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=600&fit=crop&fm=jpg&q=80")`
-          }}
-        />
-        
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-amber-900/60"></div>
-        
-        {/* Travel-themed decorative elements */}
-        <div className="absolute top-6 left-6">
-          <div className="flex space-x-3">
-            <div className="p-2 bg-amber-100/20 backdrop-blur-sm rounded-full">
-              <Compass className="w-5 h-5 text-amber-100" />
-            </div>
-            <div className="p-2 bg-amber-100/20 backdrop-blur-sm rounded-full">
-              <Mountain className="w-5 h-5 text-amber-100" />
-            </div>
-            <div className="p-2 bg-amber-100/20 backdrop-blur-sm rounded-full">
-              <TreePine className="w-5 h-5 text-amber-100" />
-            </div>
-          </div>
-        </div>
-        
-        <div className="relative px-4 py-16 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 flex items-center justify-center gap-4">
-              <Map className="w-16 h-16 text-amber-200" />
-              Your Journey Awaits
-              <Backpack className="w-16 h-16 text-amber-200" />
-            </h1>
-            <p className="text-xl text-amber-100 mb-8 max-w-2xl mx-auto">
-              Discover, plan, and track your adventures with our intelligent travel companion
-            </p>
-            
-            {/* Quick Stats */}
-            <div className="flex justify-center space-x-8 text-white">
-              <div className="text-center bg-amber-100/20 backdrop-blur-sm rounded-xl p-4 border border-amber-200/30">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Plane className="w-5 h-5 text-amber-200" />
-                  <div className="text-2xl font-bold">{tripStats?.total_trips || 0}</div>
-                </div>
-                <div className="text-amber-200">Journeys</div>
-              </div>
-              <div className="text-center bg-amber-100/20 backdrop-blur-sm rounded-xl p-4 border border-amber-200/30">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Sun className="w-5 h-5 text-amber-200" />
-                  <div className="text-2xl font-bold">{tripStats?.upcoming_trips || 0}</div>
-                </div>
-                <div className="text-amber-200">Upcoming</div>
-              </div>
-              <div className="text-center bg-amber-100/20 backdrop-blur-sm rounded-xl p-4 border border-amber-200/30">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <DollarSign className="w-5 h-5 text-amber-200" />
-                  <div className="text-2xl font-bold">
-                    ${(tripStats?.total_budget || 0).toLocaleString()}
-                  </div>
-                </div>
-                <div className="text-amber-200">Budget</div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
 
       {/* Navigation Tabs */}
       <div className="sticky top-0 z-40 bg-amber-50/95 backdrop-blur-lg border-b border-amber-200">
@@ -279,7 +208,7 @@ const TripDashboard = () => {
                       <DollarSign className="w-6 h-6 text-stone-800" />
                     </div>
                     <span className="text-2xl font-bold text-stone-900">
-                      ${(tripStats?.total_budget || 0).toLocaleString()}
+                      ₹{(tripStats?.total_budget || 0).toLocaleString('en-IN')}
                     </span>
                   </div>
                   <h3 className="text-stone-800 font-medium">Total Budget</h3>
@@ -298,65 +227,7 @@ const TripDashboard = () => {
                 </motion.div>
               </div>
 
-              {/* Recent Trips Preview */}
-              <motion.div variants={itemVariants} className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-8 border border-amber-200/50 shadow-lg">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-amber-900 flex items-center gap-3">
-                    <TreePine className="w-6 h-6 text-amber-600" />
-                    Recent Adventures
-                  </h2>
-                  <button 
-                    onClick={() => setActiveTab('trips')}
-                    className="text-amber-700 hover:text-amber-800 font-medium flex items-center space-x-1"
-                  >
-                    <span>View All</span>
-                    <Plane className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {trips.slice(0, 3).map((trip, index) => (
-                    <motion.div
-                      key={trip.trip_id}
-                      variants={itemVariants}
-                      className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-white/90 to-amber-50/80 backdrop-blur-sm border border-amber-200/50 hover:shadow-lg transition-all duration-300"
-                    >
-                      <div className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-amber-900 mb-1">{trip.destination}</h3>
-                            <p className="text-sm text-amber-700">
-                              {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            trip.status === 'upcoming' ? 'bg-amber-100 text-amber-800' :
-                            trip.status === 'ongoing' ? 'bg-emerald-100 text-emerald-800' :
-                            'bg-stone-100 text-stone-800'
-                          }`}>
-                            {trip.status}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4 text-sm text-amber-800">
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{trip.duration_days} days</span>
-                          </div>
-                          {trip.total_budget && (
-                            <div className="flex items-center space-x-1">
-                              <DollarSign className="w-4 h-4" />
-                              <span>${trip.total_budget.toLocaleString()}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="absolute inset-0 bg-gradient-to-r from-amber-600/5 to-orange-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+      
             </motion.div>
           )}
 
@@ -395,6 +266,12 @@ const TripDashboard = () => {
                     <option value="completed">Completed</option>
                   </select>
                   
+                  {/* View Toggle */}
+                  <ViewToggle 
+                    currentView={viewMode}
+                    onViewChange={setViewMode}
+                  />
+                  
                   <button 
                     onClick={handleCreateTrip}
                     className="p-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors shadow-lg hover:shadow-xl"
@@ -404,23 +281,33 @@ const TripDashboard = () => {
                 </div>
               </motion.div>
 
-              {/* Trips Grid */}
-              <motion.div 
-                variants={containerVariants}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {filteredTrips.map((trip) => (
-                  <motion.div key={trip.trip_id} variants={itemVariants}>
-                    <ModernTripCard 
-                      trip={trip}
-                      onEdit={handleEditTrip}
-                      onDelete={handleDeleteTrip}
-                      onView={handleViewTrip}
-                      showActions={true}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
+              {/* Trips Display */}
+              {viewMode === 'table' ? (
+                <motion.div variants={itemVariants}>
+                  <TripTable
+                    trips={filteredTrips}
+                    onEdit={handleEditTrip}
+                    onDelete={handleDeleteTrip}
+                    onView={handleViewTrip}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div 
+                  variants={containerVariants}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {filteredTrips.map((trip) => (
+                    <motion.div key={trip.trip_id} variants={itemVariants}>
+                      <SimpleTripCard 
+                        trip={trip}
+                        onEdit={handleEditTrip}
+                        onDelete={handleDeleteTrip}
+                        onView={handleViewTrip}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
 
               {filteredTrips.length === 0 && (
                 <motion.div 
