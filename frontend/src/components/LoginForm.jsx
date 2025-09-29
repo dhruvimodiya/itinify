@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import GoogleAuthButton from './GoogleAuthButton';
 
 const LoginForm = () => {
@@ -160,39 +166,43 @@ const LoginForm = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className={`rounded-md p-4 ${verificationRequired ? 'bg-yellow-50 border border-yellow-200' : 'bg-red-50 border border-red-200'}`}>
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className={`text-sm font-medium ${verificationRequired ? 'text-yellow-800' : 'text-red-800'}`}>
+              <Alert variant={verificationRequired ? "default" : "destructive"}>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <div>
+                    <p className="font-medium mb-2">
                       {verificationRequired ? 'Email Verification Required' : 'Login Error'}
-                    </h3>
-                    <div className={`mt-2 text-sm ${verificationRequired ? 'text-yellow-700' : 'text-red-700'}`}>
-                      <p>{error}</p>
-                      {verificationRequired && (
-                        <div className="mt-4">
-                          <button
-                            type="button"
-                            onClick={handleResendVerification}
-                            disabled={resendLoading}
-                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
-                          >
-                            {resendLoading ? 'Sending...' : 'Resend Verification Email'}
-                          </button>
-                          {resendMessage && (
-                            <p className="mt-2 text-sm text-travel-brown-600">{resendMessage}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    </p>
+                    <p>{error}</p>
+                    {verificationRequired && (
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          onClick={handleResendVerification}
+                          disabled={resendLoading}
+                          variant="outline"
+                          size="sm"
+                          className="border-travel-brown-300 hover:bg-travel-brown-50"
+                        >
+                          {resendLoading ? 'Sending...' : 'Resend Verification Email'}
+                        </Button>
+                        {resendMessage && (
+                          <p className="mt-2 text-sm text-travel-brown-600">{resendMessage}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
-              </div>
+                </AlertDescription>
+              </Alert>
             )}
 
-            <div>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-travel-brown-800 font-medium">
+                Email Address
+              </Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
@@ -200,57 +210,58 @@ const LoginForm = () => {
                 required
                 value={credentials.email}
                 onChange={handleChange}
-                placeholder="Email"
-                className="w-full px-4 py-3 bg-gray-100 border-0 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-travel-brown-500 focus:bg-white transition-all"
+                placeholder="Enter your email"
+                className="border-travel-brown-200 focus:border-travel-brown-500 focus:ring-travel-brown-500"
               />
             </div>
 
-            <div className="relative">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                required
-                value={credentials.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className="w-full px-4 py-3 pr-12 bg-gray-100 border-0 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-travel-brown-500 focus:bg-white transition-all"
-              />
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center"
-              >
-                {showPassword ? (
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                  </svg>
-                ) : (
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )}
-              </button>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-travel-brown-800 font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={credentials.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="border-travel-brown-200 focus:border-travel-brown-500 focus:ring-travel-brown-500 pr-12"
+                />
+                <Button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  variant="ghost"
+                  size="sm"
+                  className="absolute inset-y-0 right-0 px-3 hover:bg-transparent"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </Button>
+              </div>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-travel-brown-600 hover:bg-travel-brown-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-travel-brown-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Signing in...
-                  </div>
-                ) : (
-                  'Sign In'
-                )}
-              </button>
-            </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-travel-brown-600 hover:bg-travel-brown-700 text-white font-medium py-3 transition-colors"
+              size="lg"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Signing in...
+                </div>
+              ) : (
+                'Sign In'
+              )}
+            </Button>
 
             <div className="text-center pt-2">
               <span className="text-sm text-gray-600">
