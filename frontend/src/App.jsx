@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { Toaster } from '@/components/ui/toaster';
 
 import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
@@ -12,6 +13,7 @@ import CompleteProfile from './components/CompleteProfile';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import PlaceSearchComponent from './components/PlaceSearchComponent';
+import ShadcnTestComponent from './components/ShadcnTestComponent';
 
 // Page Components
 import DashboardOverview from './pages/DashboardOverview';
@@ -34,6 +36,9 @@ function App() {
             <Route path="/verify-email" element={<VerificationHandler />} />
             <Route path="/resend-verification" element={<ResendVerification />} />
             <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+            
+            {/* Test Route for Shadcn Components */}
+            <Route path="/test-shadcn" element={<ShadcnTestComponent />} />
             
             {/* Semi-Protected Route - Complete Profile */}
             <Route 
@@ -67,6 +72,7 @@ function App() {
               <Route path="profile" element={<ProfilePage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="test-shadcn" element={<ShadcnTestComponent />} />
               
               {/* Placeholder routes for future features */}
               <Route path="expenses" element={<div className="p-8 text-center"><h2 className="text-2xl font-bold text-gray-900">Expenses Module Coming Soon</h2></div>} />
@@ -79,6 +85,9 @@ function App() {
             {/* Catch all unknown routes */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
+          
+          {/* Global Toast Notifications */}
+          <Toaster />
         </div>
       </Router>
     </AuthProvider>
